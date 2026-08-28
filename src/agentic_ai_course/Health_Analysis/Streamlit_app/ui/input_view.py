@@ -1,3 +1,12 @@
+import streamlit as st
+from utils.file_utils import load_sample_report, extract_text_from_pdf
+
+
+def set_sample_report():
+    """Callback to load sample blood report into editor."""
+    sample_content = load_sample_report()
+    st.session_state["report_editor"] = sample_content
+    st.session_state["report_loaded_msg"] = "Sample blood report loaded successfully."
 
 
 def handle_file_upload():
