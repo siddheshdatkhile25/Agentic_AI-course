@@ -104,3 +104,4 @@ streamlit run src/agentic_ai_course/Health_Analysis/Streamlit_app/app.py
 ## ⚠️ Medical Disclaimer
 
 This AI tool is designed for educational and informational purposes only. It should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of a physician or qualified health provider.
+

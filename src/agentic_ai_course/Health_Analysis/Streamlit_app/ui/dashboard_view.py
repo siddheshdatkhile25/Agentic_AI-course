@@ -4,20 +4,20 @@ from services.parser_service import parse_extracted_biomarkers, parse_diet_secti
 
 
 def format_status_badge(val: str) -> str:
-    """Formats biomarker status string with styled badge."""
+    """Formats biomarker status string with standardized pill badges."""
     if val == "HIGH":
-        return '<span class="status-badge-high">🔴 HIGH</span>'
+        return '<span class="status-badge-high">HIGH</span>'
     elif val == "LOW":
-        return '<span class="status-badge-low">🟡 LOW</span>'
+        return '<span class="status-badge-low">LOW</span>'
     elif val == "NORMAL":
-        return '<span class="status-badge-normal">🟢 NORMAL</span>'
-    return val
+        return '<span class="status-badge-normal">NORMAL</span>'
+    return f'<span>{val}</span>'
 
 
 def render_dashboard(extracted_values: str, diet_summary: str):
-    """Renders the diagnostic & nutrition analysis dashboard."""
+    """Renders the diagnostic and nutrition analysis dashboard."""
     st.markdown("---")
-    st.subheader("2. Diagnostic & Nutrition Analysis Dashboard")
+    st.subheader("2. Diagnostic Analysis & Clinical Recommendations")
 
     df_results = parse_extracted_biomarkers(extracted_values)
     summary_text, avoid_text, eat_text = parse_diet_sections(diet_summary)
@@ -31,36 +31,36 @@ def render_dashboard(extracted_values: str, diet_summary: str):
 
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Total Biomarkers", total_tests)
+            st.metric("Total Parameters", total_tests)
         with col2:
-            st.metric("Normal Parameters", normal_count, delta="Normal", delta_color="normal")
+            st.metric("Within Reference Range", normal_count)
         with col3:
-            st.metric("Elevated (HIGH)", high_count, delta=f"{high_count} Alert" if high_count > 0 else None, delta_color="inverse")
+            st.metric("Elevated Parameters", high_count)
         with col4:
-            st.metric("Deficient (LOW)", low_count, delta=f"{low_count} Alert" if low_count > 0 else None, delta_color="inverse")
+            st.metric("Low Parameters", low_count)
 
     # 2. Output Tabs
     tab_tests, tab_summary, tab_diet, tab_raw = st.tabs([
-        "📊 Extracted Test Values",
-        "🩺 Patient Health Summary",
-        "🥗 Indian Diet Plan",
-        "📑 Raw Outputs & Export"
+        "Biomarker Evaluation",
+        "Clinical Summary",
+        "Dietary Protocol",
+        "Complete Report & Export"
     ])
 
     # Tab 1: Extracted Test Values
     with tab_tests:
         if not df_results.empty:
-            st.markdown("#### Test Biomarker Classifications")
+            st.markdown("#### Laboratory Biomarker Status")
 
             filter_col1, filter_col2 = st.columns([2, 2])
             with filter_col1:
                 status_filter = st.selectbox(
-                    "Filter by Status:",
-                    options=["All", "Abnormal Only (HIGH / LOW)", "HIGH", "LOW", "NORMAL"],
+                    "Filter Parameters:",
+                    options=["All Parameters", "Abnormal Only (HIGH / LOW)", "HIGH", "LOW", "NORMAL"],
                     index=0
                 )
             with filter_col2:
-                search_query = st.text_input("🔍 Search Test Name:", placeholder="e.g. Cholesterol, Glucose, ALT...")
+                search_query = st.text_input("Search Biomarker Name:", placeholder="e.g. Cholesterol, Glucose, ALT...")
 
             # Apply filters
             filtered_df = df_results.copy()
@@ -73,20 +73,20 @@ def render_dashboard(extracted_values: str, diet_summary: str):
                 filtered_df = filtered_df[filtered_df["Test Name"].str.contains(search_query.strip(), case=False, na=False)]
 
             display_df = filtered_df.copy()
-            display_df["Status Badge"] = display_df["Status"].apply(format_status_badge)
+            display_df["Status Classification"] = display_df["Status"].apply(format_status_badge)
 
             st.write(
-                display_df[["Test Name", "Measured Value", "Status Badge", "Reference Range"]]
+                display_df[["Test Name", "Measured Value", "Status Classification", "Reference Range"]]
                 .to_html(escape=False, index=False),
                 unsafe_allow_html=True
             )
-            st.caption(f"Showing {len(display_df)} of {len(df_results)} extracted biomarkers.")
+            st.caption(f"Displaying {len(display_df)} of {len(df_results)} extracted biomarkers.")
         else:
             st.markdown(extracted_values)
 
     # Tab 2: Health Summary
     with tab_summary:
-        st.markdown("#### 🩺 Clinical Insights & Patient Condition")
+        st.markdown("#### Clinical Health Summary")
         if summary_text:
             st.info(summary_text)
         else:
@@ -94,43 +94,43 @@ def render_dashboard(extracted_values: str, diet_summary: str):
 
     # Tab 3: Indian Diet Plan
     with tab_diet:
-        st.markdown("#### 🥗 Tailored Indian Dietary Recommendations")
+        st.markdown("#### Targeted Indian Dietary Protocol")
         if avoid_text or eat_text:
             diet_col1, diet_col2 = st.columns(2)
             with diet_col1:
                 with st.container(border=True):
-                    st.markdown("### 🚫 Food to Avoid")
-                    st.markdown(avoid_text if avoid_text else "No specific food items to avoid listed.")
+                    st.markdown("### Foods to Avoid")
+                    st.markdown(avoid_text if avoid_text else "No specific restrictions noted.")
             with diet_col2:
                 with st.container(border=True):
-                    st.markdown("### 🥗 Food to Eat More Of")
-                    st.markdown(eat_text if eat_text else "No specific foods to eat more of listed.")
+                    st.markdown("### Recommended Foods to Include")
+                    st.markdown(eat_text if eat_text else "No specific recommendations noted.")
         else:
             with st.container(border=True):
                 st.markdown(diet_summary)
 
     # Tab 4: Raw Outputs & Export
     with tab_raw:
-        st.markdown("#### 📑 Full Generated Report")
+        st.markdown("#### Diagnostic Report Summary")
         
-        full_report_content = f"""# Blood Work & Indian Diet Analysis Report
+        full_report_content = f"""# Clinical Blood Work & Dietary Analysis Report
 
-## 1. Extracted Lab Parameters
+## 1. Extracted Laboratory Parameters
 {extracted_values}
 
-## 2. Health Summary & Indian Diet Plan
+## 2. Clinical Health Summary & Dietary Plan
 {diet_summary}
 
 ---
-*Disclaimer: Generated by Blood Work AI. This report is for informational purposes only. Consult a doctor for medical decisions.*
+*Disclaimer: Generated by Blood Work AI. This report is for educational and informational purposes only. Consult a certified medical professional for diagnostic interpretation.*
 """
-        st.text_area("Full Markdown Content", value=full_report_content, height=250)
+        st.text_area("Markdown Report Content", value=full_report_content, height=250)
 
         # Download Buttons
         dl_col1, dl_col2 = st.columns(2)
         with dl_col1:
             st.download_button(
-                label="📥 Download Analysis Report (.md)",
+                label="Download Report (.md)",
                 data=full_report_content,
                 file_name="blood_work_analysis_report.md",
                 mime="text/markdown",
@@ -140,7 +140,7 @@ def render_dashboard(extracted_values: str, diet_summary: str):
             if not df_results.empty:
                 csv_data = df_results.to_csv(index=False)
                 st.download_button(
-                    label="📊 Download Extracted Biomarkers (.csv)",
+                    label="Download Biomarkers (.csv)",
                     data=csv_data,
                     file_name="blood_test_biomarkers.csv",
                     mime="text/csv",

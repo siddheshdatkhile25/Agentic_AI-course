@@ -23,15 +23,14 @@ from services.llm_service import (
 # Streamlit Page Setup & Styling
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Blood Work AI & Indian Diet Advisor",
-    page_icon="🩸",
+    page_title="Clinical Blood Work Analysis & Dietary Advisor",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
-st.markdown('<div class="main-header">🩸 Blood Work Analysis & Indian Diet Advisor</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Automated diagnostic report parsing, biomarker status classification, and personalized Indian dietary recommendations.</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">Clinical Blood Work Analysis & Dietary Advisor</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">Automated laboratory report parsing, biomarker reference classification, and evidence-based Indian dietary recommendations.</div>', unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
 # Main Application Flow
@@ -44,28 +43,28 @@ def main():
     active_report = render_input_section()
 
     # 3. Execution Trigger
-    analyze_btn = st.button("🚀 Analyze Blood Report", type="primary", use_container_width=True)
+    analyze_btn = st.button("Analyze Laboratory Report", type="primary", use_container_width=True)
 
     if analyze_btn:
         if not active_report:
-            st.error("❌ Please provide or load a blood test report before analyzing.")
+            st.error("Please provide or load a laboratory test report before analyzing.")
         else:
             try:
-                with st.spinner("Initializing LLM client..."):
+                with st.spinner("Connecting to inference engine..."):
                     llm = get_llm_client(model_name=selected_model, temperature=temperature)
 
-                with st.status("🔬 Processing Blood Work Report...", expanded=True) as status_box:
-                    st.write("Extracting lab markers and classifying reference intervals...")
+                with st.status("Analyzing Laboratory Report...", expanded=True) as status_box:
+                    st.write("Extracting clinical biomarkers and evaluating reference intervals...")
                     extracted_values = run_stage_1_extraction(llm, active_report)
                     st.session_state["extracted_values"] = extracted_values
-                    st.write("✅ Lab markers extracted & classified.")
+                    st.write("Biomarkers extracted and evaluated.")
 
-                    st.write("Generating clinical health summary and Indian diet plan...")
+                    st.write("Synthesizing clinical health summary and dietary protocol...")
                     diet_summary = run_stage_2_diet_summary(llm, extracted_values)
                     st.session_state["diet_summary"] = diet_summary
-                    st.write("✅ Clinical health summary & Indian diet recommendations ready.")
+                    st.write("Clinical summary and dietary recommendations generated.")
 
-                    status_box.update(label="🎉 Analysis Completed Successfully!", state="complete", expanded=False)
+                    status_box.update(label="Analysis Completed Successfully", state="complete", expanded=False)
 
             except Exception as e:
                 st.error(f"Error during analysis: {e}")
