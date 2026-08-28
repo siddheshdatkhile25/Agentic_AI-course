@@ -103,55 +103,42 @@ Reviewing Physician: Dr. Priya Nair
 """
 
 # -----------------------------------------------------------------------------
-# Standardized CSS Styling
+# Custom CSS Styling
 # -----------------------------------------------------------------------------
 CUSTOM_CSS = """
 <style>
 .main-header {
-    font-size: 2.0rem;
+    font-size: 2.2rem;
     font-weight: 700;
-    color: #0F172A;
-    letter-spacing: -0.02em;
-    margin-bottom: 0.25rem;
+    color: #1E3A8A;
+    margin-bottom: 0.2rem;
 }
 .sub-header {
-    font-size: 1.0rem;
-    color: #64748B;
+    font-size: 1.05rem;
+    color: #4B5563;
     margin-bottom: 1.5rem;
-    line-height: 1.5;
 }
 .status-badge-high {
-    background-color: #FEF2F2;
-    color: #B91C1C;
-    border: 1px solid #FECACA;
-    padding: 3px 10px;
+    background-color: #FEE2E2;
+    color: #991B1B;
+    padding: 2px 8px;
     border-radius: 4px;
-    font-size: 0.85rem;
     font-weight: 600;
-    letter-spacing: 0.02em;
-    display: inline-block;
 }
 .status-badge-low {
-    background-color: #FFFBEB;
-    color: #B45309;
-    border: 1px solid #FDE68A;
-    padding: 3px 10px;
+    background-color: #FEF3C7;
+    color: #92400E;
+    padding: 2px 8px;
     border-radius: 4px;
-    font-size: 0.85rem;
     font-weight: 600;
-    letter-spacing: 0.02em;
-    display: inline-block;
 }
 .status-badge-normal {
-    background-color: #F0FDF4;
-    color: #15803D;
-    border: 1px solid #BBF7D0;
-    padding: 3px 10px;
+    background-color: #DCFCE7;
+    color: #166534;
+    padding: 2px 8px;
     border-radius: 4px;
-    font-size: 0.85rem;
     font-weight: 600;
-    letter-spacing: 0.02em;
-    display: inline-block;
 }
 </style>
 """
+
