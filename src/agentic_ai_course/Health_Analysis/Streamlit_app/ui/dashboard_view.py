@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-from services.parser_service import parse_extracted_biomarkers, parse_diet_sections
+from services.parser_service import parse_extracted_tests, parse_diet_sections
 
 
 def format_status_badge(val: str) -> str:
-    """Formats biomarker status string with standardized pill badges."""
+    """Formats test status string with standardized pill badges."""
     if val == "HIGH":
         return '<span class="status-badge-high">HIGH</span>'
     elif val == "LOW":
@@ -19,7 +19,7 @@ def render_dashboard(extracted_values: str, diet_summary: str):
     st.markdown("---")
     st.subheader("2. Diagnostic Analysis & Clinical Recommendations")
 
-    df_results = parse_extracted_biomarkers(extracted_values)
+    df_results = parse_extracted_tests(extracted_values)
     summary_text, avoid_text, eat_text = parse_diet_sections(diet_summary)
 
     # 1. Metrics Strip
@@ -41,7 +41,7 @@ def render_dashboard(extracted_values: str, diet_summary: str):
 
     # 2. Output Tabs
     tab_tests, tab_summary, tab_diet, tab_raw = st.tabs([
-        "Biomarker Evaluation",
+        "Test Results",
         "Clinical Summary",
         "Dietary Protocol",
         "Complete Report & Export"
@@ -50,29 +50,9 @@ def render_dashboard(extracted_values: str, diet_summary: str):
     # Tab 1: Extracted Test Values
     with tab_tests:
         if not df_results.empty:
-            st.markdown("#### Laboratory Biomarker Status")
+            st.markdown("#### Laboratory Test Results")
 
-            filter_col1, filter_col2 = st.columns([2, 2])
-            with filter_col1:
-                status_filter = st.selectbox(
-                    "Filter Parameters:",
-                    options=["All Parameters", "Abnormal Only (HIGH / LOW)", "HIGH", "LOW", "NORMAL"],
-                    index=0
-                )
-            with filter_col2:
-                search_query = st.text_input("Search Biomarker Name:", placeholder="e.g. Cholesterol, Glucose, ALT...")
-
-            # Apply filters
-            filtered_df = df_results.copy()
-            if status_filter == "Abnormal Only (HIGH / LOW)":
-                filtered_df = filtered_df[filtered_df["Status"].isin(["HIGH", "LOW"])]
-            elif status_filter in ["HIGH", "LOW", "NORMAL"]:
-                filtered_df = filtered_df[filtered_df["Status"] == status_filter]
-
-            if search_query.strip():
-                filtered_df = filtered_df[filtered_df["Test Name"].str.contains(search_query.strip(), case=False, na=False)]
-
-            display_df = filtered_df.copy()
+            display_df = df_results.copy()
             display_df["Status Classification"] = display_df["Status"].apply(format_status_badge)
 
             st.write(
@@ -80,7 +60,7 @@ def render_dashboard(extracted_values: str, diet_summary: str):
                 .to_html(escape=False, index=False),
                 unsafe_allow_html=True
             )
-            st.caption(f"Displaying {len(display_df)} of {len(df_results)} extracted biomarkers.")
+            st.caption(f"Total: {len(df_results)} laboratory test parameters evaluated.")
         else:
             st.markdown(extracted_values)
 
@@ -140,9 +120,9 @@ def render_dashboard(extracted_values: str, diet_summary: str):
             if not df_results.empty:
                 csv_data = df_results.to_csv(index=False)
                 st.download_button(
-                    label="Download Biomarkers (.csv)",
+                    label="Download Test Results (.csv)",
                     data=csv_data,
-                    file_name="blood_test_biomarkers.csv",
+                    file_name="blood_test_results.csv",
                     mime="text/csv",
                     use_container_width=True
                 )
